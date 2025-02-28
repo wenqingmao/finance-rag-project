@@ -1,7 +1,18 @@
 # loader, splitter, faiss
 
-See "⭐test_url_ldr+rcs_spl.ipynb" for work. 
+⭐is current working file. 
 OG is the original file from 印度老哥. :D
+TEST is file for stage 1-2. 
+CAP = NOT IN USE
+
+
+
+
+
+
+
+
+------------- old ver. --------------
 
 ## loader 
 in use: 
