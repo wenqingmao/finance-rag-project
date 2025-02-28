@@ -15,18 +15,19 @@ load_dotenv()  # take environment variables from .env (especially openai api key
 st.title("RockyBot: News Research Tool 📈")
 st.sidebar.title("News Article URLs")
 
-urls = []
+
+urls = [] ##retrieval的过程（我们要接api【company overview】+用url【news/reports】）
 for i in range(3):
     url = st.sidebar.text_input(f"URL {i+1}")
     urls.append(url)
 
-process_url_clicked = st.sidebar.button("Process URLs")
-file_path = "faiss_store_openai.pkl"
+process_url_clicked = st.sidebar.button("Process URLs") ##执行操作
+file_path = "faiss_store_openai.pkl" ##vector DB最后建起来store的地方？
 
-main_placeholder = st.empty()
-llm = OpenAI(temperature=0.9, max_tokens=500)
+main_placeholder = st.empty() ##input的地方
+llm = OpenAI(temperature=0.9, max_tokens=500) ##接的llm
 
-if process_url_clicked:
+if process_url_clicked: ##建立vector DB的过程
     # load data
     loader = UnstructuredURLLoader(urls=urls)
     main_placeholder.text("Data Loading...Started...✅✅✅")
@@ -48,6 +49,7 @@ if process_url_clicked:
     with open(file_path, "wb") as f:
         pickle.dump(vectorstore_openai, f)
 
+
 query = main_placeholder.text_input("Question: ")
 if query:
     if os.path.exists(file_path):
@@ -66,7 +68,3 @@ if query:
                 sources_list = sources.split("\n")  # Split the sources by newline
                 for source in sources_list:
                     st.write(source)
-
-
-
-
