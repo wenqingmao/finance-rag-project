@@ -1,8 +1,8 @@
 # loader, splitter, faiss
 
-⭐is current working file. 
-OG is the original file from 印度老哥. :D
-TEST is file for stage 1-2. 
+⭐is current working file. \n
+OG is the original file from 印度老哥. :D \n
+TEST is file for stage 1-2. \n
 CAP = NOT IN USE
 
 
