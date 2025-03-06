@@ -3,6 +3,7 @@ import requests
 import pandas as pd
 import time
 import faiss
+import pickle
 from dotenv import load_dotenv
 from sentence_transformers import SentenceTransformer
 from langchain_community.document_loaders import UnstructuredURLLoader
@@ -90,6 +91,13 @@ def build_stock_index(ticker: str):
     text_chunks = split_text(parsed_docs)
     if not text_chunks:
         return {"error": "No text available after splitting"}
+    # Save the list to a pickle file
+    with open("data/chunks.pkl", "wb") as f:
+        pickle.dump(text_chunks, f)
 
     index = build_index(text_chunks)
-    return {"message": f"Index built for {ticker}", "num_vectors": len(text_chunks), "num_articles": len(parsed_docs)}
+    # Save the FAISS index to a pickle file
+    with open("data/faiss_store.pkl", "wb") as f:
+        pickle.dump(index, f)
+
+    return {"message": f"Index built for {ticker}", "num_vectors": len(text_chunks)}
