@@ -193,13 +193,17 @@ def query_llm_with_retrieval(ticker, user_query):
         {
             "role": "system",
             "content": (
-                "You are a financial assistant specializing in stock market analysis. "
-                "Use the provided company overview and recent news articles to answer user queries.\n\n"
+                "You are a financial assistant specializing in stock market analysis, with extensive pre-trained knowledge about finance. "
+                "The company overview and recent news articles are provided to help you answer the user's question. "
+                "If the articles don't address the query, you may rely on your pre-trained knowledge to provide an answer. "
+                "If you still don't know the answer, just say 'I don't know.' Don't make up an answer. "
+                "If the provided context contradicts your pre-training, favor the provided context.\n\n"
+
                 "=== Company Overview ===\n"
                 f"{company_overview}\n\n"
                 "=== Relevant News ===\n"
                 f"{retrieved_text}\n\n"
-                "Provide a well-structured financial response using the above data, and include source references."
+                "Provide a well-structured financial response using the above data or your own knowledge, and include source references when using the provided context."
             )
         },
         {
@@ -207,6 +211,7 @@ def query_llm_with_retrieval(ticker, user_query):
             "content": user_query
         }
     ]
+
 
     # Call OpenRouter's API
     completion = client.chat.completions.create(
