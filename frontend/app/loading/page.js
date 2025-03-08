@@ -28,10 +28,9 @@ export default function LoadingPage() {
     }, [ticker, router]);
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-            <img src="/logo.png" alt="Logo" className="w-32 mb-4" />
-            <h1 className="text-2xl font-semibold">Building Index for {ticker}...</h1>
-            <div className="mt-4 animate-spin h-10 w-10 border-4 border-blue-500 border-t-transparent rounded-full"></div>
-        </div>
+      <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-b from-purple-600 to-indigo-800 text-white">
+        <h1 className="text-3xl font-bold mb-4">Building Index for {ticker}...</h1>
+        <div className="w-16 h-16 border-4 border-white border-dashed rounded-full animate-spin"></div>
+      </div>
     );
 }
