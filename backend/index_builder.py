@@ -60,13 +60,17 @@ def split_text(docs: list) -> list:
     )
 
     chunks = text_splitter.split_documents(docs)
-    return [chunk.page_content for chunk in chunks]
+    # Store chunks with metadata
+    processed_chunks = [{"text": chunk.page_content, "source": chunk.metadata.get("source", "Unknown")} for chunk in chunks]
 
-def build_index(texts: list):
+    return processed_chunks
+
+def build_index(processed_chunks: list):
     """
     Build a FAISS index from text chunks.
     """
     encoder = SentenceTransformer("BAAI/bge-base-en")
+    texts = [chunk["text"] for chunk in processed_chunks]
     vectors = encoder.encode(texts)
     faiss.normalize_L2(vectors)
 
@@ -80,24 +84,28 @@ def build_stock_index(ticker: str):
     """
     Full pipeline: Fetch news → Parse content → Split text → Build FAISS index.
     """
+    # Fetch News
     news = get_stock_news(ticker)
     if "error" in news:
         return news
 
+    # Extract & Process Articles
     parsed_docs = parse_articles(news)
     if "error" in parsed_docs:
         return parsed_docs
 
-    text_chunks = split_text(parsed_docs)
-    if not text_chunks:
+    # Text Splitting
+    processed_chunks = split_text(parsed_docs)
+    if not processed_chunks:
         return {"error": "No text available after splitting"}
+    
     # Save the list to a pickle file
     with open("data/chunks.pkl", "wb") as f:
-        pickle.dump(text_chunks, f)
+        pickle.dump(processed_chunks, f)
 
-    index = build_index(text_chunks)
+    index = build_index(processed_chunks)
     # Save the FAISS index to a pickle file
     with open("data/faiss_store.pkl", "wb") as f:
         pickle.dump(index, f)
 
-    return {"message": f"Index built for {ticker}", "num_vectors": len(text_chunks)}
+    return {"message": f"Index built for {ticker}", "num_vectors": len(processed_chunks)}
