@@ -3,9 +3,8 @@ A LLM tool for equity research leveraging company financial news as external dat
 
 
 ## Run Backend
-```bash
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
+python server.py
 
 ## Run Frontend
-```
+
 npm run dev
