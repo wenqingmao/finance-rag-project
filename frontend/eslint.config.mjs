@@ -13,9 +13,11 @@
 
 // export default eslintConfig;
 
-/** @type {import('eslint').Linter.Config} */
-const eslintConfig = {
-  extends: ["next/core-web-vitals"],
-};
+import next from "@next/eslint-plugin-next";
+
+/** @type {import("eslint").FlatConfig[]} */
+const eslintConfig = [
+  ...next.configs["core-web-vitals"], // ✅ Uses Next.js' Flat Config directly
+];
 
 export default eslintConfig;
