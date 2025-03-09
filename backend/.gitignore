@@ -1,0 +1,9 @@
+# environment variables
+.env
+
+# Ignore Python compiled files
+__pycache__/
+*.pyc
+
+# Ignore Apple file
+.DS_Store
