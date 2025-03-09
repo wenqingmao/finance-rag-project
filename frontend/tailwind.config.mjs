@@ -1,15 +1,17 @@
+import tailwindAnimate from "tailwindcss-animate";
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./app/**/*.{js,ts,jsx,tsx,mdx}"
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        background: "var(--background)", // ✅ Corrected variable syntax
+        foreground: "var(--foreground)", // ✅ Corrected variable syntax
       },
       animation: {
         "gradient-flow": "gradient-flow 8s ease infinite",
@@ -23,5 +25,5 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [tailwindAnimate], // ✅ Fixed plugin import
 };

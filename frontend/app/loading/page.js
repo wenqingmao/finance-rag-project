@@ -10,15 +10,15 @@ export default function LoadingPage() {
     useEffect(() => {
         if (!ticker) {
             router.push("/");
-            return;
+            return; // ✅ Ensure execution stops here
         }
 
         // Call backend API to build index
         fetch(`/api/build-index?ticker=${ticker}`)
             .then((res) => res.json())
-            .then((data) => {
+            .then(() => {
                 console.log("Backend request successful");
-                router.push(`/research?ticker=${ticker}`); // Redirects to research page
+                router.push(`/research?ticker=${ticker}`); // Redirect to research page
             })
             .catch((err) => {
                 console.error("Error:", err);
@@ -28,9 +28,12 @@ export default function LoadingPage() {
     }, [ticker, router]);
 
     return (
-      <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-b from-purple-600 to-indigo-800 text-white">
-        <h1 className="text-3xl font-bold mb-4">Building Index for {ticker}...</h1>
-        <div className="w-16 h-16 border-4 border-white border-dashed rounded-full animate-spin"></div>
+      <div className="flex flex-col items-center justify-center w-screen min-h-screen bg-gradient-to-b from-purple-600 to-indigo-800 text-white">
+        {/* ✅ Only render ticker if it's defined to avoid hydration issues */}
+        {ticker ? <h1 className="text-3xl font-bold mb-4">Building Index for {ticker}...</h1> : null}
+        
+        {/* ✅ Added `border-t-transparent` to make the spinner visually better */}
+        <div className="w-16 h-16 border-4 border-white border-dashed border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
 }

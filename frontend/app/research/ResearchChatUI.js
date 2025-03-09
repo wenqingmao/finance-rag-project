@@ -1,5 +1,4 @@
-"use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export default function ResearchChatUI({ ticker }) {
   const [messages, setMessages] = useState([
@@ -48,19 +47,19 @@ export default function ResearchChatUI({ ticker }) {
   };
 
   return (
-    <div className="flex flex-col h-full p-6 bg-gray-100">
-      <h1 className="text-3xl font-bold text-center mb-4">Chatbot</h1>
+    <div className="flex flex-col w-full h-full bg-white p-6 rounded-lg shadow-lg">
+      <h1 className="text-3xl font-bold text-center mb-4">FinFetch</h1>
+
       {/* Chat Window */}
-      <div className="flex-grow p-4 bg-white rounded-lg shadow-md overflow-auto h-96">
+      <div className="flex-grow p-4 bg-gray-100 rounded-lg overflow-auto h-[450px]">
         {messages.map((msg, index) => (
           <div
             key={index}
-            className={`p-3 rounded-lg my-2 ${
+            className={`p-3 rounded-lg my-2 max-w-[70%] w-fit ${
               msg.sender === "user"
-                ? "bg-blue-500 text-white self-end"
-                : "bg-gray-200 text-black self-start"
+                ? "bg-blue-500 text-white self-end text-right ml-auto" 
+                : "bg-gray-200 text-black self-start text-left mr-auto" 
             }`}
-            style={{ maxWidth: "70%" }}
           >
             {msg.text}
           </div>
