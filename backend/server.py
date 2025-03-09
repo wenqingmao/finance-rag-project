@@ -34,7 +34,7 @@ async def ask_question(ticker: str = Query(..., description="Stock ticker symbol
     """
 
     async def generate_response():
-        yield f"Retrieving data for {ticker}...\n\n"
+        # yield f"Retrieving data for {ticker}...\n\n"
 
         # Call LLM function
         llm_response = query_llm_with_retrieval(ticker, question)

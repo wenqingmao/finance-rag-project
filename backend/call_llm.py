@@ -34,7 +34,7 @@ def get_company_overview(api_key, ticker):
     return overview_text  # Returns formatted string
 
 
-def retrieve_relevant_chunks(index, processed_chunks, user_query, k=3):
+def retrieve_relevant_chunks(index, processed_chunks, user_query, k=10):
     """Retrieves top-k relevant chunks along with their sources."""
     encoder = SentenceTransformer("BAAI/bge-base-en")
 
@@ -78,7 +78,7 @@ def query_llm_with_retrieval(ticker, user_query):
         processed_chunks = pickle.load(f)  # ✅ Load processed chunks separately
 
     # Retrieve top-k relevant documents
-    retrieved_docs = retrieve_relevant_chunks(index, processed_chunks, user_query, k=3)
+    retrieved_docs = retrieve_relevant_chunks(index, processed_chunks, user_query, k=10)
 
     # Format Retrieved Docs for Prompt
     retrieved_text = format_retrieved_text(retrieved_docs)
@@ -94,13 +94,17 @@ def query_llm_with_retrieval(ticker, user_query):
         {
             "role": "system",
             "content": (
-                "You are a financial assistant specializing in stock market analysis. "
-                "The company overview and recent news articles are provided to help you answer user's question.\n\n"
+                "You are a financial assistant specializing in stock market analysis."
+                "The company overview and recent news articles are provided to help you answer the user's question. "
+                "If the articles don't address the query, you may rely on your pre-trained knowledge to provide an answer. "
+                "If you still don't know the answer, just say 'I don't know.' Don't make up an answer. "
+                "If the provided context contradicts your pre-training, favor the provided context.\n\n"
+
                 "=== Company Overview ===\n"
                 f"{company_overview}\n\n"
                 "=== Relevant News ===\n"
                 f"{retrieved_text}\n\n"
-                "Provide a well-structured financial response using the above data, and include source references. If you don't know the answer, just say don't know. Don't try to make up an answer."
+                "Provide a well-structured financial response using the above data or your own knowledge, and include source references when using the provided context."
             )
         },
         {
