@@ -5,7 +5,7 @@ import faiss
 import time
 from sentence_transformers import SentenceTransformer
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.document_loaders import UnstructuredURLLoader
+from langchain_community.document_loaders import UnstructuredURLLoader
 from openai import OpenAI
 from dotenv import load_dotenv
 
