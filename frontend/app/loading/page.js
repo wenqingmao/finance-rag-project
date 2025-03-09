@@ -1,8 +1,8 @@
 "use client";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
-export default function LoadingPage() {
+function LoadingComponent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const ticker = searchParams.get("ticker");
@@ -10,7 +10,7 @@ export default function LoadingPage() {
     useEffect(() => {
         if (!ticker) {
             router.push("/");
-            return; 
+            return;
         }
 
         // Call backend API to build index
@@ -28,16 +28,17 @@ export default function LoadingPage() {
     }, [ticker, router]);
 
     return (
-      <div className="flex flex-col items-center justify-center w-screen min-h-screen bg-gradient-to-b from-purple-600 to-indigo-800 text-white">
-        {/* Only render ticker if it's defined to avoid hydration issues */}
-        {ticker ? <h1 className="text-3xl font-bold mb-4">Building Index for {ticker}...</h1> : null}
-        
-        {/* Added `border-t-transparent` to make the spinner visually better */}
-        <div className="w-16 h-16 border-4 border-white border-dashed border-t-transparent rounded-full animate-spin"></div>
-      </div>
+        <div className="flex flex-col items-center justify-center w-screen min-h-screen bg-gradient-to-b from-purple-600 to-indigo-800 text-white">
+            {/* Only render ticker if it's defined to avoid hydration issues */}
+            {ticker ? <h1 className="text-3xl font-bold mb-4">Building Index for {ticker}...</h1> : null}
+            
+            {/* Added `border-t-transparent` to make the spinner visually better */}
+            <div className="w-16 h-16 border-4 border-white border-dashed border-t-transparent rounded-full animate-spin"></div>
+        </div>
     );
 }
 
+// Wrap `LoadingComponent` inside `<Suspense>` correctly
 export default function LoadingPage() {
     return (
         <Suspense fallback={<div>Loading...</div>}>
