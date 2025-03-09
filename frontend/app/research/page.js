@@ -24,3 +24,11 @@ export default function ResearchPage() {
     </div>
   );
 }
+
+export default function ResearchPage() {
+  return (
+      <Suspense fallback={<div>Loading...</div>}>
+          <ResearchComponent />
+      </Suspense>
+  );
+}
