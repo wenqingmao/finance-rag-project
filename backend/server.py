@@ -1,11 +1,13 @@
 from fastapi import FastAPI, Query
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import index_builder
 from call_llm import query_llm_with_retrieval
 import time
 import uvicorn
-from fastapi.responses import JSONResponse
+import os
+
+os.makedirs("data", exist_ok=True)
 
 app = FastAPI()
 
