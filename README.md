@@ -1,5 +1,5 @@
 # finance-rag-project
-A LLM tool for equity research leveraging company financial news as external database
+A LLM & RAG powered tool for equity research leveraging company financial news as external database
 
 
 ## Run Backend
