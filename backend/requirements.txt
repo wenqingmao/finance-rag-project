@@ -7,4 +7,3 @@ sentence-transformers
 langchain
 libmagic
 python-magic
-python-magic-bin
