@@ -1,7 +1,7 @@
 import os
 import requests
 import pandas as pd
-import time
+# import time
 import faiss
 import pickle
 from dotenv import load_dotenv

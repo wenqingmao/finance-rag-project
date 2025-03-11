@@ -5,6 +5,9 @@ import index_builder
 from call_llm import query_llm_with_retrieval
 import time
 import uvicorn
+import os
+
+os.makedirs("data", exist_ok=True)
 
 app = FastAPI()
 
