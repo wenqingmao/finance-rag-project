@@ -2,7 +2,7 @@ import os
 import pickle
 import requests
 import faiss
-import time
+# import time
 from sentence_transformers import SentenceTransformer
 from openai import OpenAI
 from dotenv import load_dotenv
