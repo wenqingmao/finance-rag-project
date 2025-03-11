@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Query
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import index_builder
 from call_llm import query_llm_with_retrieval
@@ -26,7 +26,8 @@ async def build_index(ticker: str = Query(..., description="Stock ticker symbol"
     API to fetch stock news and build an index.
     """
     response = index_builder.build_stock_index(ticker)
-    return response
+    # return response
+    return JSONResponse(content=response)
 
 @app.get("/ask/")
 async def ask_question(ticker: str = Query(..., description="Stock ticker symbol"),
