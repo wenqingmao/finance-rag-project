@@ -67,7 +67,13 @@ export default function ResearchChatUI({ ticker }) {
       </div>
 
       {/* Input Box */}
-      <div className="flex mt-4">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault(); 
+          handleSend(); 
+        }}
+        className="flex mt-4"
+      >
         <input
           type="text"
           className="flex-grow p-2 border rounded-md"
@@ -76,13 +82,14 @@ export default function ResearchChatUI({ ticker }) {
           onChange={(e) => setQuery(e.target.value)}
         />
         <button
-          onClick={handleSend}
+          type="submit"
           className="ml-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
           disabled={loading}
         >
           {loading ? "..." : "➤"}
         </button>
-      </div>
+      </form>
+
     </div>
   );
 }
