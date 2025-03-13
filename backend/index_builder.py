@@ -20,6 +20,8 @@ def get_stock_news(ticker: str) -> list:
     ticker = ticker.upper()
     url = "https://www.alphavantage.co/query"
     
+    print(f"API_KEY: {API_KEY}")
+    
     params = {
         "function": "NEWS_SENTIMENT",
         "tickers": ticker,
@@ -32,6 +34,7 @@ def get_stock_news(ticker: str) -> list:
         return {"error": "Failed to fetch data"}
 
     data = response.json()
+    print("Full API Response:", data) 
     if "feed" not in data:
         return {"error": "No news available"}
 
