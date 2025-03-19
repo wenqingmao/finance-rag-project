@@ -10,9 +10,11 @@ export async function GET(req) {
   const apiKey = process.env.ALPHA_VANTAGE_API_KEY;
   const alphaUrl = `https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers=${ticker}&apikey=${apiKey}&sort=RELEVANCE`;
 
+  
   try {
       const alphaRes = await fetch(alphaUrl);
       const alphaData = await alphaRes.json();
+      console.log(alphaData);
 
       // Forward alphaData.feed AND ticker to the FastAPI backend
       const backendRes = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/build-index`, {
