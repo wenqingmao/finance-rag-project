@@ -7,7 +7,6 @@ from dotenv import load_dotenv
 from sentence_transformers import SentenceTransformer
 from langchain_community.document_loaders import UnstructuredURLLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-import json
 
 # Load environment variables if needed
 load_dotenv()
@@ -66,22 +65,17 @@ def build_index(processed_chunks: list):
     index.add(vectors)
     return index
 
-def build_stock_index_from_feed(news_obj: list, ticker: Optional[str] = None):
+def build_stock_index_from_feed(feed: list, ticker: Optional[str] = None):
     """
     We now receive a feed directly from the frontend.
     'feed' is a list of dictionaries (or Pydantic FeedItem objects)
     that contain at least 'url' for each item.
     """
-    if not news_obj:
+    if not feed:
         return {"error": "No feed provided"}
-    
-    # print(f"news_obj type: {type(news_obj)}")
-    
-    news = news_obj["feed"]
-    # print(f"feed in build_stock_index_from_feed(): {news}")
 
     # 1) Parse articles using their URLs
-    parsed_docs = parse_articles(news)
+    parsed_docs = parse_articles(feed)
     if isinstance(parsed_docs, dict) and "error" in parsed_docs:
         return parsed_docs  # error happened
 
