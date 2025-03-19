@@ -1,31 +1,53 @@
 import os
 import requests
+import pandas as pd
+# import time
 import faiss
 import pickle
-from typing import List, Dict, Any, Optional
 from dotenv import load_dotenv
 from sentence_transformers import SentenceTransformer
 from langchain_community.document_loaders import UnstructuredURLLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-import json
 
-# Load environment variables if needed
+# Load API Key from .env
 load_dotenv()
+API_KEY = os.getenv("ALPHA_VANTAGE_API_KEY")
 
-# We no longer define get_stock_news(ticker) here,
-# because we’ll fetch that in the frontend.
+def get_stock_news(ticker: str) -> list:
+    """
+    Fetch stock news from Alpha Vantage API.
+    """
+    ticker = ticker.upper()
+    url = "https://www.alphavantage.co/query"
+    
+    print(f"API_KEY: {API_KEY}")
+    
+    params = {
+        "function": "NEWS_SENTIMENT",
+        "tickers": ticker,
+        "apikey": API_KEY,
+        "sort": "RELEVANCE"
+    }
+
+    response = requests.get(url, params=params)
+    if response.status_code != 200:
+        return {"error": "Failed to fetch data"}
+
+    data = response.json()
+    print("Full API Response:", data) 
+    if "feed" not in data:
+        return {"error": "No news available"}
+
+    return data["feed"]
 
 def parse_articles(articles: list) -> list:
     """
     Extract article text using LangChain's UnstructuredURLLoader.
-    'articles' is a list of dicts with (at least) 'url'.
     """
-    # Each article should at least have a 'url' key
-    urls = [article["url"] for article in articles]
-
+    urls = [article['url'] for article in articles]
     loader = UnstructuredURLLoader(urls=urls)
+    
     try:
-        # loads each URL and returns structured docs
         parsed_docs = loader.load()
         return parsed_docs
     except Exception as e:
@@ -36,19 +58,13 @@ def split_text(docs: list) -> list:
     Split text into smaller chunks.
     """
     text_splitter = RecursiveCharacterTextSplitter(
-        separators=["\n\n", "\n", ".", ","],
+        separators=['\n\n', '\n', '.', ','],
         chunk_size=1000
     )
-    chunks = text_splitter.split_documents(docs)
 
-    # Convert to a list of dicts with "text" and "source"
-    processed_chunks = [
-        {
-            "text": chunk.page_content,
-            "source": chunk.metadata.get("source", "Unknown")
-        }
-        for chunk in chunks
-    ]
+    chunks = text_splitter.split_documents(docs)
+    # Store chunks with metadata
+    processed_chunks = [{"text": chunk.page_content, "source": chunk.metadata.get("source", "Unknown")} for chunk in chunks]
 
     return processed_chunks
 
@@ -64,44 +80,35 @@ def build_index(processed_chunks: list):
     dim = vectors.shape[1]
     index = faiss.IndexFlatL2(dim)
     index.add(vectors)
+
     return index
 
-def build_stock_index_from_feed(news_obj: list, ticker: Optional[str] = None):
+def build_stock_index(ticker: str):
     """
-    We now receive a feed directly from the frontend.
-    'feed' is a list of dictionaries (or Pydantic FeedItem objects)
-    that contain at least 'url' for each item.
+    Full pipeline: Fetch news → Parse content → Split text → Build FAISS index.
     """
-    if not news_obj:
-        return {"error": "No feed provided"}
-    
-    # print(f"news_obj type: {type(news_obj)}")
-    
-    news = news_obj["feed"]
-    # print(f"feed in build_stock_index_from_feed(): {news}")
+    # Fetch News
+    news = get_stock_news(ticker)
+    if "error" in news:
+        return news
 
-    # 1) Parse articles using their URLs
+    # Extract & Process Articles
     parsed_docs = parse_articles(news)
-    if isinstance(parsed_docs, dict) and "error" in parsed_docs:
-        return parsed_docs  # error happened
+    if "error" in parsed_docs:
+        return parsed_docs
 
-    # 2) Split text into chunks
+    # Text Splitting
     processed_chunks = split_text(parsed_docs)
     if not processed_chunks:
         return {"error": "No text available after splitting"}
-
-    # 3) Persist the chunks locally (optional)
-    os.makedirs("data", exist_ok=True)
+    
+    # Save the list to a pickle file
     with open("data/chunks.pkl", "wb") as f:
         pickle.dump(processed_chunks, f)
 
-    # 4) Build the FAISS index
     index = build_index(processed_chunks)
-
-    # 5) Persist the index locally (optional)
+    # Save the FAISS index to a pickle file
     with open("data/faiss_store.pkl", "wb") as f:
         pickle.dump(index, f)
 
-    # 6) Return result
-    msg = f"Index built for {ticker}" if ticker else "Index built"
-    return {"message": msg, "num_vectors": len(processed_chunks)}
+    return {"message": f"Index built for {ticker}", "num_vectors": len(processed_chunks)}
