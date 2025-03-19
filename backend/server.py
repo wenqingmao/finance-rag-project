@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Query
 from fastapi.responses import StreamingResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from models import FeedRequest
 import index_builder
 from call_llm import query_llm_with_retrieval
 import time
@@ -19,6 +20,18 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.post("/build-index")
+def build_index_endpoint(feed_request: FeedRequest):
+    # feed_request.feed is now a list of FeedItem objects
+    # each item includes everything from 'title', 'url', 'authors' etc.
+
+    feed = feed_request.feed  # This is a list of FeedItem objects
+    ticker = feed_request.ticker  # if provided
+
+    # Now pass this to your refactored pipeline:
+    result = build_stock_index_from_feed(feed, ticker)
+    return result
 
 @app.get("/build-index/")
 async def build_index(ticker: str = Query(..., description="Stock ticker symbol")):

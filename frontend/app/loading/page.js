@@ -13,8 +13,8 @@ function LoadingComponent() {
             return;
         }
 
-        // Call backend API to build index
-        fetch(`/api/build-index?ticker=${ticker}`)
+        // Call news API to build index
+        fetch(`/api/news?ticker=${ticker}`)
             .then((res) => res.json())
             .then(() => {
                 console.log("Backend request successful");
