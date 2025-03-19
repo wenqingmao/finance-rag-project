@@ -1,4 +1,5 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, Request
+from typing import Any
 from fastapi.responses import StreamingResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import index_builder
@@ -20,14 +21,30 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/build-index/")
-async def build_index(ticker: str = Query(..., description="Stock ticker symbol")):
-    """
-    API to fetch stock news and build an index.
-    """
-    response = index_builder.build_stock_index(ticker)
-    # return response
-    return JSONResponse(content=response)
+
+@app.post("/build-index")
+async def build_index_endpoint(request: Request):
+    # Read the entire body as JSON (a dict or list)
+    data = await request.json()
+
+    # Extract data['feed']
+    news = data.get("alphaData", {})
+    
+    # Extract ticker
+    ticker = data.get("ticker") 
+
+    # Now pass this to your refactored pipeline:
+    result = index_builder.build_stock_index_from_feed(news, ticker)
+    return result
+
+# @app.get("/build-index/")
+# async def build_index(ticker: str = Query(..., description="Stock ticker symbol")):
+#     """
+#     API to fetch stock news and build an index.
+#     """
+#     response = index_builder.build_stock_index(ticker)
+#     # return response
+#     return JSONResponse(content=response)
 
 @app.get("/ask/")
 async def ask_question(ticker: str = Query(..., description="Stock ticker symbol"),

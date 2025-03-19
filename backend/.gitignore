@@ -5,5 +5,8 @@
 __pycache__/
 *.pyc
 
+# Ignore pkl files
+*.pkl
+
 # Ignore Apple file
 .DS_Store
