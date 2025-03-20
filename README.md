@@ -17,7 +17,7 @@ Finfetch is a user-friendly RAG-based LLM tool designed for effortless informati
 We have created 2 versions, one with a fullstack architecture with a separate front and backend, and another using streamlit architecture.
 
 
-## Version 1 (Streamlit)
+## Version 1 (Streamlit, Recommended)
 
 ![](images/finfetch.png)
 
@@ -87,8 +87,8 @@ We have created 2 versions, one with a fullstack architecture with a separate fr
 ```
 
 # Alpha Vantage 
-This project uses the Alpha Vantage API as the financial data provider. Note that free Alpha Vantage API keys are limited to 25 requests/day. You can request your own API key [here]:https://www.alphavantage.co/support/#api-key
+This project uses the Alpha Vantage API as the financial data provider. Note that free Alpha Vantage API keys are limited to 25 requests/day. You can request your own API key [here](https://www.alphavantage.co/support/#api-key)
 
 # OpenRouter
-OpenRouter is a platform that provides a unified interface for accessing and integrating multiple large language models (LLMs). For this project, we used llama-3.3-70b-instruct:free model. You can request your own API key [here]:https://openrouter.ai/docs/api-reference/authentication
+OpenRouter is a platform that provides a unified interface for accessing and integrating multiple large language models (LLMs). For this project, we used llama-3.3-70b-instruct:free model. You can request your own API key [here](https://openrouter.ai/docs/api-reference/authentication)
 
