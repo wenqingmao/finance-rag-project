@@ -1,5 +1,7 @@
+
 # Finfetch: Financial Research Tool
 Finfetch is a user-friendly RAG-based LLM tool designed for effortless information retrieval. Leveraging company financial news as external database, it can assist with financial news summary, equity research, and more.
+
 
 **Demo**: [Streamlit App](https://finfetch.streamlit.app/)
 
@@ -13,6 +15,7 @@ Finfetch is a user-friendly RAG-based LLM tool designed for effortless informati
 
 # Installation
 We have created 2 versions, one with a fullstack architecture with a separate front and backend, and another using streamlit architecture.
+
 
 ## Version 1 (Streamlit)
 
@@ -88,3 +91,4 @@ This project uses the Alpha Vantage API as the financial data provider. Note tha
 
 # OpenRouter
 OpenRouter is a platform that provides a unified interface for accessing and integrating multiple large language models (LLMs). For this project, we used llama-3.3-70b-instruct:free model. You can request your own API key [here]:https://openrouter.ai/docs/api-reference/authentication
+
