@@ -19,10 +19,11 @@ torch.classes.__path__ = [os.path.join(torch.__path__[0], torch.classes.__file__
 load_dotenv()
 ALPHA_VANTAGE_API_KEY = os.getenv("ALPHA_VANTAGE_API_KEY")
 OPEN_ROUTER_API_KEY = os.getenv("OPEN_ROUTER_API_KEY")
-FAISS_DIR = "streamlit/data/"
-os.makedirs(FAISS_DIR, exist_ok=True)
 
 st.set_page_config(page_title="FinFetch", layout="wide")
+
+FAISS_DIR = "streamlit/data/"
+os.makedirs(FAISS_DIR, exist_ok=True)
 
 # Function to check if index already exists for today
 def get_faiss_filename(ticker):
@@ -270,41 +271,6 @@ def query_llm_with_retrieval(ticker, user_query):
 # 7) Streamlit UI
 ########################################
 
-# # Sidebar settings
-# with st.sidebar:
-#     st.header("Settings")
-#     ticker = st.text_input("Enter Stock Ticker:")
-#     if st.button("Build Index"):
-#         with st.spinner("Fetching stock news and building index..."):
-#             response = build_stock_index(ticker)
-#             if "error" in response:
-#                 st.error(response["error"])
-#             else:
-#                 st.success(f"Index built for {ticker}!")
-
-# # Main UI Chatbot Interface
-# st.title("📈 FinFetch")
-# st.caption("🚀 Get financial insights powered by RAG")
-
-# st.markdown( """ <style> .st-emotion-cache-janbn0 { flex-direction: row-reverse; text-align: right; } </style> """, unsafe_allow_html=True, )
-
-# if "messages" not in st.session_state:
-#     st.session_state["messages"] = [{"role": "assistant", "content": "How can I assist you with financial insights?"}]
-
-# for msg in st.session_state.messages:
-#     st.chat_message(msg["role"]).write(msg["content"])
-
-# if user_query := st.chat_input("Ask a financial question..."):
-#     if not os.path.exists(FAISS_FILE) or not os.path.exists(CHUNKS_FILE):
-#         st.error("Please build the index first!")
-#     else:
-#         with st.spinner("Generating answer..."):
-#             response = query_llm_with_retrieval(ticker, user_query)
-#             st.session_state.messages.append({"role": "user", "content": user_query})
-#             st.chat_message("user").write(user_query)
-#             st.session_state.messages.append({"role": "assistant", "content": response})
-#             st.chat_message("assistant").write(response)
-
 def response_generator(text: str, delay: float = 0.05):
     """
     Yields chunks of text while preserving newlines and spacing,
@@ -329,16 +295,30 @@ def response_generator(text: str, delay: float = 0.05):
 
 # Sidebar settings
 with st.sidebar:
-    # st.image("logo.png", width=60)
+    st.image("streamlit/FinFetch Logo.png", width=80)
     st.header("Build Index")
+
     ticker = st.text_input("Enter Stock Ticker:")
+
+    # Display current ticker at the bottom
+
+    # ticker_placeholder = st.empty()
+    # if ticker:
+    #     ticker_placeholder.write(f"**Current Ticker:** {ticker}")
+    if not ticker:
+        st.write("**Current Company:** None")
+    if ticker:
+        st.write(f"**Current Company:** {ticker}")
+
     if st.button("Submit"):
         with st.spinner("Fetching stock news and building index..."):
             response = build_stock_index(ticker)
             if "error" in response:
                 st.error(response["error"])
             else:
-                st.success(f"Index built for {ticker}!")
+                st.success(response["message"])
+
+    
 
 # Main UI Chatbot Interface
 st.title("📈 FinFetch")
