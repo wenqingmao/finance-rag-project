@@ -18,7 +18,6 @@ torch.classes.__path__ = [os.path.join(torch.__path__[0], torch.classes.__file__
 # Load environment variables
 load_dotenv()
 ALPHA_VANTAGE_API_KEY = os.getenv("ALPHA_VANTAGE_API_KEY")
-print(f"ALPHA_VANTAGE_API_KEY: {ALPHA_VANTAGE_API_KEY}")
 OPEN_ROUTER_API_KEY = os.getenv("OPEN_ROUTER_API_KEY")
 FAISS_DIR = "data/"
 os.makedirs(FAISS_DIR, exist_ok=True)
