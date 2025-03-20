@@ -1,0 +1,4 @@
+streamlit/.env
+.DS_Store
+streamlit/data/chunks.pkl
+streamlit/data/faiss_store.pkl
