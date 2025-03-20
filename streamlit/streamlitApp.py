@@ -24,14 +24,6 @@ os.makedirs(FAISS_DIR, exist_ok=True)
 
 st.set_page_config(page_title="FinFetch", layout="wide")
 
-# Load valid stock symbols
-LISTING_FILE = "data/listing_status.csv"
-valid_symbols = set()
-if os.path.exists(LISTING_FILE):
-    df = pd.read_csv(LISTING_FILE)
-    if "symbol" in df.columns:
-        valid_symbols = set(df["symbol"].str.upper())
-
 # Function to check if index already exists for today
 def get_faiss_filename(ticker):
     today = datetime.today().strftime('%Y-%m-%d')
@@ -137,6 +129,15 @@ def build_index(processed_chunks: list):
 def build_stock_index(ticker: str):
     ticker = ticker.upper()
     
+    # Load valid stock symbols
+    LISTING_FILE = "data/listing_status.csv"
+    valid_symbols = set()
+    if os.path.exists(LISTING_FILE):
+        df = pd.read_csv(LISTING_FILE)
+        print('Successfully read valid ticker list!')
+        if "symbol" in df.columns:
+            valid_symbols = set(df["symbol"].str.upper())
+
     # Validate ticker
     if ticker not in valid_symbols:
         return {"error": "Invalid ticker symbol. Please enter a valid stock ticker."}
