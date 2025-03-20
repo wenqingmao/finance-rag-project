@@ -8,3 +8,4 @@ python-magic
 pandas
 openai
 unstructured
+torch
