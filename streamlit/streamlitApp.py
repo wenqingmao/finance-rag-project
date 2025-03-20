@@ -273,7 +273,7 @@ def response_generator(text: str, delay: float = 0.05):
 
 # Sidebar settings
 with st.sidebar:
-    st.image("logo.png", width=60)
+    # st.image("logo.png", width=60)
     st.header("Build Index")
     ticker = st.text_input("Enter Stock Ticker:")
     if st.button("Submit"):
