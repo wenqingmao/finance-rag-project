@@ -7,3 +7,4 @@ libmagic
 python-magic
 pandas
 openai
+unstructured
