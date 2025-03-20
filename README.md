@@ -52,6 +52,7 @@ We have created 2 versions, one with a fullstack architecture with a separate fr
 ![](images/homePage.png)
 ![](images/researchPage.png)
 
+1.Clone this repository to your local machine using:
 ```bash
   git clone git@github.com:wenqingmao/finance-rag-project.git
 ```
