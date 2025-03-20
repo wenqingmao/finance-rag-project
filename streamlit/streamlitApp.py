@@ -4,6 +4,8 @@ import time
 import os
 import requests
 import faiss
+import pandas as pd
+from datetime import datetime
 from sentence_transformers import SentenceTransformer
 from langchain_community.document_loaders import UnstructuredURLLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -17,10 +19,30 @@ torch.classes.__path__ = [os.path.join(torch.__path__[0], torch.classes.__file__
 load_dotenv()
 ALPHA_VANTAGE_API_KEY = os.getenv("ALPHA_VANTAGE_API_KEY")
 OPEN_ROUTER_API_KEY = os.getenv("OPEN_ROUTER_API_KEY")
-FAISS_FILE = "data/faiss_store.pkl"
-CHUNKS_FILE = "data/chunks.pkl"
+FAISS_DIR = "data/"
+os.makedirs(FAISS_DIR, exist_ok=True)
 
 st.set_page_config(page_title="FinFetch", layout="wide")
+
+# Load valid stock symbols
+LISTING_FILE = "data/listing_status.csv"
+valid_symbols = set()
+if os.path.exists(LISTING_FILE):
+    df = pd.read_csv(LISTING_FILE)
+    if "symbol" in df.columns:
+        valid_symbols = set(df["symbol"].str.upper())
+
+# Function to check if index already exists for today
+def get_faiss_filename(ticker):
+    today = datetime.today().strftime('%Y-%m-%d')
+    return os.path.join(FAISS_DIR, f"faiss_{ticker}_{today}.pkl")
+
+def get_chunks_filename(ticker):
+    today = datetime.today().strftime('%Y-%m-%d')
+    return os.path.join(FAISS_DIR, f"chunks_{ticker}_{today}.pkl")
+
+def is_index_cached(ticker):
+    return os.path.exists(get_faiss_filename(ticker)) and os.path.exists(get_chunks_filename(ticker))
 
 ########################################
 # 2) Utility Functions (News, Overview)
@@ -113,9 +135,17 @@ def build_index(processed_chunks: list):
 # 5) Full Pipeline to Build & Cache Index
 ########################################
 def build_stock_index(ticker: str):
-    """
-    Full pipeline: Fetch news -> Parse content -> Split text -> Build FAISS index.
-    """
+    ticker = ticker.upper()
+    
+    # Validate ticker
+    if ticker not in valid_symbols:
+        return {"error": "Invalid ticker symbol. Please enter a valid stock ticker."}
+    
+    # Check if index already exists
+    if is_index_cached(ticker):
+        return {"message": f"Index already built for {ticker} today. Retrieving cached index."}
+    
+    # Fetch news from Alpha Vantage
     news = get_stock_news(ticker)
     if "error" in news:
         return news
@@ -129,13 +159,13 @@ def build_stock_index(ticker: str):
         return {"error": "No text available after splitting"}
 
     # Save processed chunks
-    os.makedirs("data", exist_ok=True)
-    with open(CHUNKS_FILE, "wb") as f:
+    os.makedirs(FAISS_DIR, exist_ok=True)
+    with open(get_chunks_filename(ticker), "wb") as f:
         pickle.dump(processed_chunks, f)
 
     # Build and save FAISS index
     index = build_index(processed_chunks)
-    with open(FAISS_FILE, "wb") as f:
+    with open(get_faiss_filename(ticker), "wb") as f:
         pickle.dump(index, f)
 
     return {"message": f"Index built for {ticker}", "num_vectors": len(processed_chunks)}
@@ -159,11 +189,20 @@ def format_retrieved_text(retrieved_docs):
 
 def query_llm_with_retrieval(ticker, user_query):
     """Retrieves relevant news chunks and queries OpenRouter LLM."""
+    ticker = ticker.upper()
+    faiss_file = get_faiss_filename(ticker)
+    chunks_file = get_chunks_filename(ticker)
+
+    # Check if the index exists
+    if not os.path.exists(faiss_file) or not os.path.exists(chunks_file):
+        return {"error": f"No index found for {ticker} today. Please build the index first."}
+
     # Load FAISS Index
-    with open(FAISS_FILE, "rb") as f:
+    with open(faiss_file, "rb") as f:
         index = pickle.load(f)
 
-    with open(CHUNKS_FILE, "rb") as f:
+    # Load Processed Chunks
+    with open(chunks_file, "rb") as f:
         processed_chunks = pickle.load(f)
 
     # Retrieve top-k relevant documents
@@ -188,6 +227,12 @@ def query_llm_with_retrieval(ticker, user_query):
                 "If the articles don't address the query, you may rely on your pre-trained knowledge to provide an answer. "
                 "If you still don't know the answer, just say 'I don't know.' Don't make up an answer. "
                 "If the provided context contradicts your pre-training, favor the provided context.\n\n"
+                "You must include references in your final answer if you use any of the provided articles.\n"
+                "Use the following format strictly:\n\n"
+                "Answer Body (with in-text citations like [1], [2], etc.)\n\n"
+                "References:\n"
+                "[1] <url>\n"
+                "[2] <url>\n\n"
 
                 "=== Company Overview ===\n"
                 f"{company_overview}\n\n"
@@ -197,6 +242,12 @@ def query_llm_with_retrieval(ticker, user_query):
                 "and include source references when using the provided context."
                 "In your response, add space, new line, or any other separator when necessary."
                 
+            )
+        },
+        {
+            "role": "assistant",
+            "content": (
+                "Understood. I will provide references as specified."
             )
         },
         {
@@ -316,15 +367,19 @@ for msg in st.session_state.messages:
 
 # User query input
 if user_query := st.chat_input("Ask a financial question..."):
-    if not os.path.exists(FAISS_FILE) or not os.path.exists(CHUNKS_FILE):
-        st.error("Please build the index first!")
+    ticker = ticker.upper()
+    faiss_file = get_faiss_filename(ticker)
+    chunks_file = get_chunks_filename(ticker)
+
+    # Validate if the FAISS index exists for the given ticker and today's date
+    if not os.path.exists(faiss_file) or not os.path.exists(chunks_file):
+        st.error(f"No index found for {ticker} today. Please build the index first.")
     else:
         # 1) Add user message to conversation & display
         st.session_state.messages.append({"role": "user", "content": user_query})
         st.chat_message("user").write(user_query)
 
         with st.spinner("Generating answer..."):
-
             # 2) Retrieve entire answer from your LLM or RAG pipeline
             full_answer = query_llm_with_retrieval(ticker, user_query)
             print(full_answer)
