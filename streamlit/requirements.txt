@@ -1,0 +1,9 @@
+faiss-cpu
+python-dotenv
+sentence-transformers
+langchain
+langchain_community
+libmagic
+python-magic
+pandas
+openai
