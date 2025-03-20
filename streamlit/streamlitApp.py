@@ -9,6 +9,9 @@ from langchain_community.document_loaders import UnstructuredURLLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from openai import OpenAI
 from dotenv import load_dotenv
+import torch
+
+torch.classes.__path__ = [os.path.join(torch.__path__[0], torch.classes.__file__)] # Fix for TorchScript error
 
 # Load environment variables
 load_dotenv()
