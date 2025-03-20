@@ -19,7 +19,7 @@ torch.classes.__path__ = [os.path.join(torch.__path__[0], torch.classes.__file__
 load_dotenv()
 ALPHA_VANTAGE_API_KEY = os.getenv("ALPHA_VANTAGE_API_KEY")
 OPEN_ROUTER_API_KEY = os.getenv("OPEN_ROUTER_API_KEY")
-FAISS_DIR = "data/"
+FAISS_DIR = "streamlit/data/"
 os.makedirs(FAISS_DIR, exist_ok=True)
 
 st.set_page_config(page_title="FinFetch", layout="wide")
@@ -129,8 +129,9 @@ def build_index(processed_chunks: list):
 def build_stock_index(ticker: str):
     ticker = ticker.upper()
     
+    print(ticker)
     # Load valid stock symbols
-    LISTING_FILE = "data/listing_status.csv"
+    LISTING_FILE = "streamlit/data/listing_status.csv"
     valid_symbols = set()
     if os.path.exists(LISTING_FILE):
         df = pd.read_csv(LISTING_FILE)
